@@ -1,51 +1,36 @@
 
 package tools;
 
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 public class PersonalDuplicateRemover implements DuplicateRemover {
 
-    private List<String> characterStrings;
-    private Set<String> uniqueCharacterStrings;
-    
-    public PersonalDuplicateRemover() {
-        this.characterStrings = new ArrayList<String>();
-        this.uniqueCharacterStrings = new HashSet<String>();
-    }
+    private Set<String> uniqueCharacterStrings = new HashSet<String>();
+    private int numberOfDuplicates;
 
     @Override
     public void add(String characterString) {
-        this.characterStrings.add(characterString);
-        if (!this.uniqueCharacterStrings.contains(characterString)) {
-                this.uniqueCharacterStrings.add(characterString);
-            }
+        boolean added = uniqueCharacterStrings.add(characterString);
+        if (!added) {
+            numberOfDuplicates++;
+        }
     }
 
     @Override
     public void empty() {
-        this.characterStrings.clear();
         this.uniqueCharacterStrings.clear();
+        numberOfDuplicates = 0;
     }
 
     @Override
     public int getNumberOfDetectedDuplicates() {
-        int detectedDuplicates = 0;
-        int pos = 0;
-        for (String s : this.characterStrings) {
-            if (pos < this.characterStrings.lastIndexOf(s)) {
-                detectedDuplicates++;
-            }
-            pos++;
-        }
-        return detectedDuplicates;
+        return numberOfDuplicates;
     }
 
     @Override
     public Set<String> getUniqueCharacterStrings() {
-        return this.uniqueCharacterStrings;
+        return uniqueCharacterStrings;
     }
     
     
