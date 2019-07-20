@@ -101,9 +101,6 @@ public class ContainerHistory {
         if (record.isEmpty()) {
             return "[]";
         }
-        if (record.size() == 1) {
-            return "[" + record.get(0) + "]";
-        }
         StringBuilder sb = new StringBuilder();
         for (Double situation : record) {
             sb.append(situation.toString()).append(", ");
