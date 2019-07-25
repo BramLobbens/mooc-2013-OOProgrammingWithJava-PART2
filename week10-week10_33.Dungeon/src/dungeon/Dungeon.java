@@ -9,8 +9,8 @@ import java.util.Set;
 
 /*
 * TO DO:
-* - fix collision with enemies
-* - implement win mechanic
+* - implement random movement vampires
+* - fix collision with enemies before stats updated
 */
 
 public class Dungeon {
@@ -25,6 +25,11 @@ public class Dungeon {
 
     private Player player;
     private Set<Character> enemies;
+    private Set<Character> killedEnemies;
+    
+    private final char playerChar = '@';
+    private final char vampireChar = 'v';
+    private final char terrainChar = '.';
 
     public Dungeon(int length, int height, int vampires, int moves, boolean vampiresMove) {
         this.length = length;
@@ -38,12 +43,19 @@ public class Dungeon {
 
     public void run() {
         populate();
-
+        boolean win = false;
+        
         while (true) {
             // update screen
             displayStats();
             drawDungeon();
-
+            
+            // check win condition
+            if (enemies.isEmpty()) {
+                win = true;
+                break;
+            }
+            
             // get user input
             String command = reader.nextLine();
             if (command.toLowerCase().equals("x")) {
@@ -52,21 +64,23 @@ public class Dungeon {
             for (char c : command.toCharArray()) {
                 handleInput(c + "");
             }
-
+            
             moves--;
             if (moves == 0) {
                 break;
             }
         }
-
-        System.out.println("Game over!");
+        
+        String message = win ? "YOU WIN" : "YOU LOSE";
+        System.out.println(message);
     }
 
     private void populate() {
-        this.player = new Player('@');
+        this.player = new Player(playerChar);
         this.enemies = new HashSet<Character>();
+        this.killedEnemies = new HashSet<Character>();
         for (int i = 0; i < vampires; i++) {
-            enemies.add(new Vampire(length, height, 'v'));
+            enemies.add(new Vampire(length, height, vampireChar));
         }
     }
 
@@ -86,25 +100,33 @@ public class Dungeon {
 
                 boolean drawn = false;
 
-                // draw enemy positions
-                for (Character e : enemies) {
-                    if (e.getPos().isPosition(j, i)) {
-                        System.out.print(e.getSymbol());
-                        drawn = true;
-                    }
-                }
-                
                 // draw player's position
                 if (player.getPos().isPosition(j, i)) {
                     System.out.print(player.getSymbol());
                     drawn = true;
                 }
                 
-                if (!drawn) {
-                    System.out.print(".");
+                // draw enemy positions
+                for (Character e : enemies) {
+                    if (e.getPos().isPosition(j, i)) {
+                        
+                        // queue enemy to be killed if player on enemy position
+                        if (drawn) {
+                            killedEnemies.add(e);
+                        }
+                        else {
+                            System.out.print(e.getSymbol());
+                            drawn = true;
+                        }
+                    }
                 }
+                
+                if (!drawn) {
+                    System.out.print(terrainChar); // terrain is drawn if no character is on this position
+                }
+                
+                enemies.removeAll(killedEnemies);
             }
-            // start new line
             System.out.println();
         }
     }
