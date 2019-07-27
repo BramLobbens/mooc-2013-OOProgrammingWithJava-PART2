@@ -23,6 +23,27 @@ public abstract class Character {
         this.pos = position;
     }
     
+    public abstract void move(int x, int y);
+    
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        
+        Character other = (Character) obj;
+        return this.getPos().equals(other.getPos());
+    }
+
+    @Override
+    public int hashCode() {
+        return pos.hashCode();
+    }
+    
     @Override
     public String toString() {
         return symbol + " " + pos;

@@ -18,24 +18,36 @@ public class Position {
     public int getY() {
         return y;
     }
-    
 
-    public void updateX(int n) {
-        x += n;
+    public void setX(int x) {
+        this.x = x;
+    }
+
+    public void setY(int y) {
+        this.y = y;
     }
     
-    public void updateY(int n) {
-        y += n;
-    }
-    
-    public boolean isPosition(int x, int y) {
-        return this.x == x && this.y == y;
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        
+        Position other = (Position) obj;
+        return this.x == other.x && this.y == other.y;
     }
 
     @Override
-    public String toString() {
-        return "(" + x + ", " + y + ")";
+    public int hashCode() {
+        return x + y;
     }
     
-    
+    @Override
+    public String toString() {
+        return x + " " + y;
+    }  
 }

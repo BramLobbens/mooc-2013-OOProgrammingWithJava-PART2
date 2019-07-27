@@ -12,5 +12,10 @@ public class Vampire extends Character {
         super(new Position(new Random().nextInt(x - 1) + 1, new Random().nextInt(y - 1) + 1), symbol);
     }
 
+    @Override
+    public void move(int x, int y) {
+        super.getPos().setX(new Random().nextInt(x - 1) + 1);
+        super.getPos().setY(new Random().nextInt(y - 1) + 1);
+    }
     
 }

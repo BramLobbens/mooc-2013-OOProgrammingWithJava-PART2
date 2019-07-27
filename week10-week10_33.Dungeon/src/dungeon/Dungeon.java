@@ -3,16 +3,16 @@ package dungeon;
 import character.Vampire;
 import character.Player;
 import character.Character;
+import character.Position;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Scanner;
 import java.util.Set;
 
 /*
-* TO DO:
-* - implement random movement vampires
-* - fix collision with enemies before stats updated
-*/
-
+ * TO FIX - bug causing enemies not being removed when updating random position
+ */
 public class Dungeon {
 
     private Scanner reader;
@@ -25,8 +25,8 @@ public class Dungeon {
 
     private Player player;
     private Set<Character> enemies;
-    private Set<Character> killedEnemies;
-    
+    private List<Character> toBeRemoved;
+
     private final char playerChar = '@';
     private final char vampireChar = 'v';
     private final char terrainChar = '.';
@@ -44,18 +44,18 @@ public class Dungeon {
     public void run() {
         populate();
         boolean win = false;
-        
+
         while (true) {
             // update screen
             displayStats();
             drawDungeon();
-            
+
             // check win condition
             if (enemies.isEmpty()) {
                 win = true;
                 break;
             }
-            
+
             // get user input
             String command = reader.nextLine();
             if (command.toLowerCase().equals("x")) {
@@ -64,13 +64,29 @@ public class Dungeon {
             for (char c : command.toCharArray()) {
                 handleInput(c + "");
             }
+
+            // check collisions
+            for (Character e : enemies) {
+                if (e.getPos().equals(player.getPos())) {
+                    toBeRemoved.add(e);
+                }
+            }
+            enemies.removeAll(toBeRemoved);
             
+            // TO DO: FIX BUG
+            // vampires move
+            if (vampiresMove) {
+                for (Character e : enemies) {
+                    e.move(length, height);
+                }
+            }
+
             moves--;
             if (moves == 0) {
                 break;
             }
         }
-        
+
         String message = win ? "YOU WIN" : "YOU LOSE";
         System.out.println(message);
     }
@@ -78,10 +94,10 @@ public class Dungeon {
     private void populate() {
         this.player = new Player(playerChar);
         this.enemies = new HashSet<Character>();
-        this.killedEnemies = new HashSet<Character>();
         for (int i = 0; i < vampires; i++) {
             enemies.add(new Vampire(length, height, vampireChar));
         }
+        this.toBeRemoved = new ArrayList<Character>();
     }
 
     private void displayStats() {
@@ -101,31 +117,23 @@ public class Dungeon {
                 boolean drawn = false;
 
                 // draw player's position
-                if (player.getPos().isPosition(j, i)) {
+                if (player.getPos().equals(new Position(j, i))) {
                     System.out.print(player.getSymbol());
                     drawn = true;
                 }
-                
+
                 // draw enemy positions
                 for (Character e : enemies) {
-                    if (e.getPos().isPosition(j, i)) {
-                        
-                        // queue enemy to be killed if player on enemy position
-                        if (drawn) {
-                            killedEnemies.add(e);
-                        }
-                        else {
-                            System.out.print(e.getSymbol());
-                            drawn = true;
-                        }
+                    if (e.getPos().equals(new Position(j, i))) {
+                        System.out.print(e.getSymbol());
+                        drawn = true;
                     }
                 }
-                
+
+                // terrain is drawn if no character is on this position
                 if (!drawn) {
-                    System.out.print(terrainChar); // terrain is drawn if no character is on this position
+                    System.out.print(terrainChar);
                 }
-                
-                enemies.removeAll(killedEnemies);
             }
             System.out.println();
         }
@@ -136,25 +144,25 @@ public class Dungeon {
         // up
         if (command.toLowerCase().equals("w")) {
             if (!isOutOfBounds(player.getPos().getX(), player.getPos().getY() - 1)) {
-                player.up();
+                player.move(0, -1);
             }
         }
         // down
         if (command.toLowerCase().equals("s")) {
             if (!isOutOfBounds(player.getPos().getX(), player.getPos().getY() + 1)) {
-                player.down();
+                player.move(0, 1);
             }
         }
         // left
         if (command.toLowerCase().equals("a")) {
             if (!isOutOfBounds(player.getPos().getX() - 1, player.getPos().getY())) {
-                player.left();
+                player.move(-1, 0);
             }
         }
         // right
         if (command.toLowerCase().equals("d")) {
             if (!isOutOfBounds(player.getPos().getX() + 1, player.getPos().getY())) {
-                player.right();
+                player.move(1, 0);
             }
         }
     }
@@ -162,5 +170,5 @@ public class Dungeon {
     private boolean isOutOfBounds(int x, int y) {
         return (x < 0) || (x > length - 1) || (y < 0) || (y > height - 1);
     }
-    
+
 }
