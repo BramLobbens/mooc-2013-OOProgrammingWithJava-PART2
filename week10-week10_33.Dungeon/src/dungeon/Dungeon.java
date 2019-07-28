@@ -10,9 +10,6 @@ import java.util.List;
 import java.util.Scanner;
 import java.util.Set;
 
-/*
- * TO FIX - bug causing enemies not being removed when updating random position
- */
 public class Dungeon {
 
     private Scanner reader;
@@ -73,7 +70,6 @@ public class Dungeon {
             }
             enemies.removeAll(toBeRemoved);
             
-            // TO DO: FIX BUG
             // vampires move
             if (vampiresMove) {
                 for (Character e : enemies) {
@@ -102,7 +98,7 @@ public class Dungeon {
 
     private void displayStats() {
         StringBuilder sb = new StringBuilder();
-        sb.append(moves + "\n\n");
+        sb.append("Torchlight: " + moves + "\n\n");
         sb.append(player + "\n");
         for (Character e : enemies) {
             sb.append(e + "\n");

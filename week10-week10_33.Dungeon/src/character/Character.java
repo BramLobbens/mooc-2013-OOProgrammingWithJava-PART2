@@ -41,7 +41,8 @@ public abstract class Character {
 
     @Override
     public int hashCode() {
-        return pos.hashCode();
+        int num = 7;
+        return num + (int) symbol;
     }
     
     @Override
