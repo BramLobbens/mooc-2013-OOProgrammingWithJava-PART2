@@ -24,27 +24,19 @@ public class GraphicCalculator implements Runnable {
         frame.setPreferredSize(new Dimension(300, 200));
         frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 
-        frame.setLayout(new GridLayout(3, 1));
-
         createComponents(frame.getContentPane());
         frame.pack();
         frame.setVisible(true);
     }
 
     private void createComponents(Container container) {
-
+        frame.setLayout(new GridLayout(3, 1));    
         JTextField output = new JTextField("0");
         output.setEnabled(false);
-
         JTextField input = new JTextField();
-
         container.add(output);
         container.add(input);
-        container.add(createButtons(input, output), BorderLayout.SOUTH);
-
-    }
-
-    private JPanel createButtons(JTextField input, JTextField output) {
+        
         JPanel panel = new JPanel(new GridLayout(1, 3));
 
         JButton add = new JButton("+");
@@ -53,18 +45,16 @@ public class GraphicCalculator implements Runnable {
         reset.setEnabled(false);
 
         // eventlistener
-        String action = "add";
-        add.addActionListener(new ClickListener(input, output, calculator, action, reset));
-        action = "subtract";
-        sub.addActionListener(new ClickListener(input, output, calculator, action, reset));
-        action = "reset";
-        reset.addActionListener(new ClickListener(input, output, calculator, action, reset));
+        ClickListener handler = new ClickListener(calculator, input, output, add, sub, reset);
+        add.addActionListener(handler);
+        sub.addActionListener(handler);
+        reset.addActionListener(handler);
 
         panel.add(add);
         panel.add(sub);
         panel.add(reset);
+        container.add(panel);
 
-        return panel;
     }
 
     public JFrame getFrame() {
